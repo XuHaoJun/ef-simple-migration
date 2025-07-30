@@ -33,10 +33,6 @@ PROD_CONNECTION_STRING=server=prod-server;port=3306;database=myapp;uid=root;pwd=
 # Development database connection (target state)
 DEV_CONNECTION_STRING=server=dev-server;port=3306;database=myapp_dev;uid=root;pwd=YourPassword
 
-# Optional: Schema/namespace settings
-NAMESPACE=MyApp.Models
-CONTEXT_NAME=MyAppContext
-
 # Optional: Advanced settings
 CLEANUP_TEMP=false
 VERBOSE=false
@@ -57,14 +53,14 @@ Choose one of the following methods:
 
 ```bash
 # Build the image
-docker build -t ef-simple-migration .
+# docker build -t ef-simple-migration .
 
 # Run the migration
 docker run --rm -it \
   --network host \
   -v ./output:/app/output \
   -v ./.env:/app/.env \
-  ef-simple-migration
+  xuhaojun/ef-simple-migration
 ```
 
 The migration SQL script will be generated at `./output/migration.sql`.
