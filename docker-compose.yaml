@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  # Example MySQL service (for testing)
+  mysql-db:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: test
+    ports:
+      - "3306:3306"
+    networks:
+      - database-network
+
+networks:
+  database-network:
+    driver: bridge
