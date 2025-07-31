@@ -14,7 +14,8 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.7" />
-    <PackageReference Include="MySql.EntityFrameworkCore" Version="9.0.6" />
+    <!-- <PackageReference Include="MySql.EntityFrameworkCore" Version="9.0.6" /> -->
+    <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="9.0.0-rc.1.efcore.9.0.0" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="9.0.0" />
@@ -27,4 +28,7 @@
     <Compile Remove="Program3.cs" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Remove="output/**/*.cs" />
+  </ItemGroup>
 </Project>

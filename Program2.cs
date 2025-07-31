@@ -14,8 +14,12 @@ var connectionString = builder.Configuration["DEV_CONNECTION_STRING"] ??
                       builder.Configuration["PROD_CONNECTION_STRING"] ??
                       "server=localhost;port=3306;database=myapp;uid=root;pwd=YourPassword";
 
+// builder.Services.AddDbContext<ScaffoldedContext>(options =>
+//     options.UseMySQL(connectionString));
+
+var serverVersion = new MySqlServerVersion(new Version(8, 4, 5));
 builder.Services.AddDbContext<ScaffoldedContext>(options =>
-    options.UseMySQL(connectionString));
+    options.UseMySql(connectionString, serverVersion));
 
 var host = builder.Build();
 

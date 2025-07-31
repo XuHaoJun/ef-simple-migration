@@ -63,7 +63,7 @@ docker run --rm -it \
   xuhaojun/ef-simple-migration
 ```
 
-The migration SQL script will be generated at `./output/migration.sql`.
+The migration SQL script will be generated at `./output/up.sql`, `./output/down.sql`.
 
 ## Environment Configuration
 
@@ -129,7 +129,8 @@ DEV_CONNECTION_STRING=server=localhost;port=3306;database=myapp_dev;uid=root;pwd
 ### Sample Output Structure
 ```
 output/
-├── migration.sql                    # Ready-to-execute SQL script
+├── up.sql                           # Ready-to-execute SQL script
+├── down.sql                         # Ready-to-execute SQL script
 ├── migration-log.txt                # Detailed process log
 ├── Models/                          # Scaffolded entity models
 │   ├── User.cs

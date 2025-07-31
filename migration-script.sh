@@ -101,7 +101,8 @@ case "$DB_TYPE" in
         PROVIDER="Microsoft.EntityFrameworkCore.SqlServer"
         ;;
     "mysql")
-        PROVIDER="MySql.EntityFrameworkCore"
+        # PROVIDER="MySql.EntityFrameworkCore"
+        PROVIDER="Pomelo.EntityFrameworkCore.MySql"
         ;;
     "postgresql"|"postgres")
         PROVIDER="Npgsql.EntityFrameworkCore.PostgreSQL"
@@ -130,6 +131,7 @@ dotnet ef dbcontext scaffold "$PROD_CONNECTION_STRING" "$PROVIDER" \
     --context "$CONTEXT_NAME" \
     --namespace "$NAMESPACE" \
     --force \
+    --data-annotations \
     --no-onconfiguring 2>&1 | tee -a "${BASE_DIR}/output/migration-log.txt"
 
 if [ $? -ne 0 ]; then
@@ -161,6 +163,7 @@ dotnet ef dbcontext scaffold "$DEV_CONNECTION_STRING" "$PROVIDER" \
     --context "$CONTEXT_NAME" \
     --namespace "$NAMESPACE" \
     --force \
+    --data-annotations \
     --no-onconfiguring 2>&1 | tee -a "${BASE_DIR}/output/migration-log.txt"
 
 if [ $? -ne 0 ]; then
@@ -185,7 +188,11 @@ log "ProductionToDev migration created successfully"
 log "Step 5: Generating SQL migration script..."
 dotnet ef migrations script InitialSnapshot ProductionToDev \
     --context "$CONTEXT_NAME" \
-    --output "$OUTPUT_DIR/migration.sql" 2>&1 | tee -a "${BASE_DIR}/output/migration-log.txt"
+    --output "$OUTPUT_DIR/up.sql" 2>&1 | tee -a "${BASE_DIR}/output/migration-log.txt"
+
+dotnet ef migrations script ProductionToDev InitialSnapshot  \
+    --context "$CONTEXT_NAME" \
+    --output "$OUTPUT_DIR/down.sql" 2>&1 | tee -a "${BASE_DIR}/output/migration-log.txt"
 
 if [ $? -ne 0 ]; then
     error "Failed to generate SQL migration script"
@@ -196,9 +203,9 @@ log "SQL migration script generated successfully"
 
 # Copy generated files to output directory
 # log "Copying generated files to output directory..."
-# cp -r Models/ "$OUTPUT_DIR/" 2>/dev/null || warn "No Models directory to copy"
-# cp -r Contexts/ "$OUTPUT_DIR/" 2>/dev/null || warn "No Contexts directory to copy"  
-# cp -r Migrations/ "$OUTPUT_DIR/" 2>/dev/null || warn "No Migrations directory to copy"
+cp -r Models/ "$OUTPUT_DIR/" 2>/dev/null || warn "No Models directory to copy"
+cp -r Contexts/ "$OUTPUT_DIR/" 2>/dev/null || warn "No Contexts directory to copy"  
+cp -r Migrations/ "$OUTPUT_DIR/" 2>/dev/null || warn "No Migrations directory to copy"
 
 # Generate summary
 log "Generating migration summary..."
@@ -216,7 +223,8 @@ cat > "$OUTPUT_DIR/migration-summary.json" << EOF
     "ProductionToDev"
   ],
   "output_files": [
-    "migration.sql",
+    "up.sql",
+    "down.sql",
     "migration-log.txt",
     "migration-summary.json",
     "Models/",
@@ -226,12 +234,11 @@ cat > "$OUTPUT_DIR/migration-summary.json" << EOF
 }
 EOF
 
-# Check if migration.sql was generated and has content
-if [ -f "$OUTPUT_DIR/migration.sql" ] && [ -s "$OUTPUT_DIR/migration.sql" ]; then
-    MIGRATION_SIZE=$(wc -c < "$OUTPUT_DIR/migration.sql")
-    log "SUCCESS: Migration script generated (${MIGRATION_SIZE} bytes)"
+# Check if up.sql and down.sql were generated and have content
+if [ -f "$OUTPUT_DIR/up.sql" ] && [ -s "$OUTPUT_DIR/up.sql" ] && [ -f "$OUTPUT_DIR/down.sql" ] && [ -s "$OUTPUT_DIR/down.sql" ]; then
     log "Output files:"
-    log "  - $OUTPUT_DIR/migration.sql"
+    log "  - $OUTPUT_DIR/up.sql"
+    log "  - $OUTPUT_DIR/down.sql"
     log "  - $OUTPUT_DIR/migration-log.txt"
     log "  - $OUTPUT_DIR/migration-summary.json"
     log "  - $OUTPUT_DIR/Models/"
